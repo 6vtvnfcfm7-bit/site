@@ -115,7 +115,6 @@
     <div class="nav-item active" onclick="switchPanel('total')">总数据</div>
     <div class="nav-item" onclick="switchPanel('non_vw')">自有数据</div>
     <div class="nav-item" onclick="switchPanel('renming_vw')">菲利信</div>
-    <div class="nav-item" onclick="switchPanel('errors')">审核错误</div>
   </div>
 
   <div class="content">
@@ -161,6 +160,12 @@
           <div id="non-vw-cross" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
+      <div class="panel">
+        <div class="panel-header">审核错误case（非vw）</div>
+        <div class="panel-body">
+          <div id="non-vw-error" class="table-container"><div class="loading">加载中...</div></div>
+        </div>
+      </div>
     </div>
 
     <!-- 板块3：菲利信（_vw审核员） -->
@@ -183,14 +188,10 @@
           <div id="vw-cross" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
-    </div>
-
-    <!-- 板块4：审核错误 -->
-    <div id="panel-errors" class="content-panel">
       <div class="panel">
-        <div class="panel-header">审核错误case（非vw）</div>
+        <div class="panel-header">审核错误case（vw审核员）</div>
         <div class="panel-body">
-          <div id="errors-non-vw" class="table-container"><div class="loading">加载中...</div></div>
+          <div id="vw-error" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
     </div>
@@ -273,23 +274,21 @@ function renderAll() {
   renderSheet('non-vw-business', '按业务统计（全部）');
   renderSheet('non-vw-person', '按人统计（非_vw审核员）');
   renderSheet('non-vw-cross', '交叉统计_非vw');
+  renderSheet('non-vw-error', '审核错误case_非vw');
 
   // 板块3：菲利信（vw审核员）
   renderSheet('vw-business', '按业务统计（全部）');
   renderSheet('vw-person', '按人统计（_vw审核员）');
   renderSheet('vw-cross', '交叉统计_vw');
-
-  // 板块4：审核错误（主看板只用非vw）
-  renderErrorNonVw();
+  renderSheet('vw-error', '菲利信_审核错误case_vw');
 
 }
 
 function loadData() {
   // 加载中状态
   ['total-business','total-person','total-cross',
-   'non-vw-business','non-vw-person','non-vw-cross',
-   'vw-business','vw-person','vw-cross',
-   'errors-non-vw'].forEach(id => {
+   'non-vw-business','non-vw-person','non-vw-cross','non-vw-error',
+   'vw-business','vw-person','vw-cross','vw-error'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = '<div class="loading">加载中...</div>';
   });
@@ -309,23 +308,6 @@ function loadData() {
 // 初始加载
 loadData();
 
-// 审核错误专用列过滤（主看板：非vw）
-function renderErrorNonVw() {
-  const sheetName = '审核错误case_非vw';
-  if (!globalData || !globalData.sheets || !globalData.sheets[sheetName]) {
-    document.getElementById('errors-non-vw').innerHTML = '<div class="empty-tip">暂无数据</div>';
-    return;
-  }
-  const sheet = globalData.sheets[sheetName];
-  const allCols = sheet.columns;
-  const targetCols = ['数据ID','operator','qid','rid','result','标注标签（标签组）','标题','内容','commandNo','is_error','error_type'];
-  const cols = targetCols.filter(c => allCols.includes(c));
-  if (cols.length === 0) {
-    document.getElementById('errors-non-vw').innerHTML = '<div class="empty-tip">暂无数据</div>';
-    return;
-  }
-  renderTable('errors-non-vw', cols, sheet.data);
-}
 </script>
 </body>
 </html>
