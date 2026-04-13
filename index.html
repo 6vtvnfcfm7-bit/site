@@ -137,24 +137,21 @@
       </div>
     </div>
 
-    <!-- 板块2：自有数据 -->
+    <!-- 板块2：自有数据（非_vw审核员） -->
     <div id="panel-non_vw" class="content-panel">
+      <div class="panel">
+        <div class="panel-header">
+          按业务统计（全部）
+          <button class="refresh-btn" onclick="loadData()">刷新</button>
+        </div>
+        <div class="panel-body">
+          <div id="non-vw-business" class="table-container"><div class="loading">加载中...</div></div>
+        </div>
+      </div>
       <div class="panel">
         <div class="panel-header">按人统计（非_vw审核员）</div>
         <div class="panel-body">
           <div id="non-vw-person" class="table-container"><div class="loading">加载中...</div></div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-header">交叉统计_非vw</div>
-        <div class="panel-body">
-          <div id="non-vw-cross" class="table-container"><div class="loading">加载中...</div></div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-header">审核错误case_非vw</div>
-        <div class="panel-body">
-          <div id="non-vw-error" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
     </div>
@@ -162,21 +159,18 @@
     <!-- 板块3：菲利信（_vw审核员） -->
     <div id="panel-renming_vw" class="content-panel">
       <div class="panel">
+        <div class="panel-header">
+          按业务统计（全部）
+          <button class="refresh-btn" onclick="loadData()">刷新</button>
+        </div>
+        <div class="panel-body">
+          <div id="vw-business" class="table-container"><div class="loading">加载中...</div></div>
+        </div>
+      </div>
+      <div class="panel">
         <div class="panel-header">按人统计（_vw审核员）</div>
         <div class="panel-body">
           <div id="vw-person" class="table-container"><div class="loading">加载中...</div></div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-header">交叉统计_vw</div>
-        <div class="panel-body">
-          <div id="vw-cross" class="table-container"><div class="loading">加载中...</div></div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-header">审核错误case_vw</div>
-        <div class="panel-body">
-          <div id="vw-error" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
     </div>
@@ -255,15 +249,13 @@ function renderAll() {
   renderSheet('total-business', '按业务统计（全部）');
   renderSheet('total-person', '按人统计（全部）');
 
-  // 板块2：自有数据
+  // 板块2：自有数据（非_vw审核员）
+  renderSheet('non-vw-business', '按业务统计（全部）');
   renderSheet('non-vw-person', '按人统计（非_vw审核员）');
-  renderSheet('non-vw-cross', '交叉统计_非vw');
-  renderSheet('non-vw-error', '审核错误case_非vw');
 
-  // 板块3：菲利信
+  // 板块3：菲利信（_vw审核员）
+  renderSheet('vw-business', '按业务统计（全部）');
   renderSheet('vw-person', '按人统计（_vw审核员）');
-  renderSheet('vw-cross', '交叉统计_vw');
-  renderSheet('vw-error', '审核错误case_vw');
 
 }
 
