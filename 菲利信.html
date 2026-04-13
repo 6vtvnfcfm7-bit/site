@@ -99,6 +99,12 @@
       <div id="flx-cross" class="table-container"><div class="loading">加载中...</div></div>
     </div>
   </div>
+  <div class="panel">
+    <div class="panel-header">审核错误case（人名vw）</div>
+    <div class="panel-body">
+      <div id="flx-error" class="table-container"><div class="loading">加载中...</div></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -160,10 +166,30 @@ function renderAll() {
   renderSheet('flx-business', '菲利信_按审核区统计_shenhe_vw');
   renderSheet('flx-person', '菲利信_按人统计_shenhe_vw');
   renderSheet('flx-cross', '菲利信_交叉统计_shenhe_vw');
+  // 审核错误专用列
+  renderFlxError();
+}
+
+// 菲利信审核错误：数据ID, operator, qid, rid, result, 标题, 内容, 审核区, is_error, error_type
+function renderFlxError() {
+  const sheetName = '菲利信_审核错误case_vw';
+  if (!globalData || !globalData.sheets || !globalData.sheets[sheetName]) {
+    document.getElementById('flx-error').innerHTML = '<div class="empty-tip">暂无数据</div>';
+    return;
+  }
+  const sheet = globalData.sheets[sheetName];
+  const allCols = sheet.columns;
+  const targetCols = ['数据ID','operator','qid','rid','result','标题','内容','审核区','is_error','error_type'];
+  const cols = targetCols.filter(c => allCols.includes(c));
+  if (cols.length === 0) {
+    document.getElementById('flx-error').innerHTML = '<div class="empty-tip">暂无数据</div>';
+    return;
+  }
+  renderTable('flx-error', cols, sheet.data);
 }
 
 function loadData() {
-  ['flx-business','flx-person','flx-cross'].forEach(id => {
+  ['flx-business','flx-person','flx-cross','flx-error'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = '<div class="loading">加载中...</div>';
   });
