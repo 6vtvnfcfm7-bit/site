@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>菲利信质检看板</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #e8c547 0%, #d4a017 100%);
+      color: white;
+      padding: 15px 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 { font-size: 22px; font-weight: 600; }
+    .header-right { display: flex; align-items: center; gap: 15px; font-size: 13px; opacity: 0.9; }
+    .content { padding: 20px; }
+    .panel {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 12px 18px;
+      border-bottom: 1px solid #eee;
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      background: #fafbfc;
+    }
+    .panel-body { padding: 0; }
+    .table-container { overflow-x: auto; max-height: 500px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #555;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tr:hover td { background: #f8f9ff; }
+    tr.total-row td { background: #fffbe6; font-weight: 600; color: #333; }
+    .loading { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+    .refresh-btn {
+      padding: 4px 12px;
+      background: #d4a017;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s;
+    }
+    .refresh-btn:hover { background: #b8890f; }
+    .empty-tip { text-align: center; padding: 40px; color: #bbb; font-size: 14px; }
+    .acc-green { color: #16a34a; font-weight: 600; }
+    .acc-orange { color: #ea580c; font-weight: 600; }
+    .acc-red { color: #dc2626; font-weight: 600; }
+    .error-cell { max-width: 300px; white-space: normal; word-break: break-all; font-size: 12px; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <h1>菲利信质检看板</h1>
+  <div class="header-right">
+    <span id="dataDate">数据日期：加载中...</span>
+    <button class="refresh-btn" onclick="loadData()">刷新数据</button>
+  </div>
+</div>
+
+<div class="content">
+  <div class="panel">
+    <div class="panel-header">按审核区统计（人名vw映射）</div>
+    <div class="panel-body">
+      <div id="flx-business" class="table-container"><div class="loading">加载中...</div></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header">按人统计（人名vw）</div>
+    <div class="panel-body">
+      <div id="flx-person" class="table-container"><div class="loading">加载中...</div></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header">交叉统计（人名vw）</div>
+    <div class="panel-body">
+      <div id="flx-cross" class="table-container"><div class="loading">加载中...</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA_URL = 'https://raw.githubusercontent.com/6vtvnfcfm7-bit/site/main/data.json';
+let globalData = null;
+
+function renderTable(containerId, columns, rows) {
+  const container = document.getElementById(containerId);
+  if (!rows || rows.length === 0) {
+    container.innerHTML = '<div class="empty-tip">暂无数据</div>';
+    return;
+  }
+  let html = '<table><thead><tr>';
+  columns.forEach(c => { html += '<th>' + escHtml(c) + '</th>'; });
+  html += '</tr></thead><tbody>';
+  rows.forEach(row => {
+    const isTotalRow = row[columns[0]] === '总计';
+    html += isTotalRow ? '<tr class="total-row">' : '<tr>';
+    columns.forEach(col => {
+      let val = row[col] !== undefined ? String(row[col]) : '';
+      let cls = '';
+      if (col.includes('准确率') && val.includes('%')) {
+        const num = parseFloat(val);
+        if (!isNaN(num)) {
+          if (num >= 99) cls = 'acc-green';
+          else if (num >= 98) cls = 'acc-orange';
+          else cls = 'acc-red';
+        }
+      }
+      const wrapCols = ['内容', '标题', '标注标签（标签组）', 'error_type'];
+      const isWrap = wrapCols.some(w => col.includes(w));
+      html += '<td' + (cls ? ' class="' + cls + (isWrap ? ' error-cell' : '') + '"' : (isWrap ? ' class="error-cell"' : '')) + '>' + escHtml(val) + '</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderSheet(containerId, sheetName) {
+  if (!globalData || !globalData.sheets || !globalData.sheets[sheetName]) {
+    document.getElementById(containerId).innerHTML = '<div class="empty-tip">暂无 ' + sheetName + ' 数据</div>';
+    return;
+  }
+  const sheet = globalData.sheets[sheetName];
+  renderTable(containerId, sheet.columns, sheet.data);
+}
+
+function renderAll() {
+  if (!globalData) return;
+  const meta = globalData.meta || {};
+  document.getElementById('dataDate').textContent = '数据日期：' + (meta.date || '未知');
+
+  // 菲利信专用数据（来自shenhe_vw副报表）
+  renderSheet('flx-business', '菲利信_按审核区统计_shenhe_vw');
+  renderSheet('flx-person', '菲利信_按人统计_shenhe_vw');
+  renderSheet('flx-cross', '菲利信_交叉统计_shenhe_vw');
+}
+
+function loadData() {
+  ['flx-business','flx-person','flx-cross'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<div class="loading">加载中...</div>';
+  });
+
+  fetch(DATA_URL + '?t=' + Date.now())
+    .then(r => r.json())
+    .then(data => {
+      globalData = data;
+      renderAll();
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById('flx-business').innerHTML = '<div class="empty-tip">数据加载失败，请稍后刷新重试</div>';
+    });
+}
+
+loadData();
+</script>
+</body>
+</html>
