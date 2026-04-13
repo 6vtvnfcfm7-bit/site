@@ -115,7 +115,6 @@
     <div class="nav-item active" onclick="switchPanel('total')">总数据</div>
     <div class="nav-item" onclick="switchPanel('non_vw')">自有数据</div>
     <div class="nav-item" onclick="switchPanel('renming_vw')">菲利信</div>
-    <div class="nav-item" onclick="switchPanel('shenhe_vw')">云腾</div>
   </div>
 
   <div class="content">
@@ -182,20 +181,12 @@
       </div>
     </div>
 
-    <!-- 板块4：云腾 -->
-    <div id="panel-shenhe_vw" class="content-panel">
-      <div class="panel">
-        <div class="panel-header">按审核区统计</div>
-        <div class="panel-body">
-          <div id="shenhe-area" class="table-container"><div class="loading">加载中...</div></div>
-        </div>
-      </div>
-    </div>
+
   </div>
 </div>
 
 <script>
-const DATA_URL = 'https://raw.githubusercontent.com/6vtvnfcfm7-bit/site/build/data.json';
+const DATA_URL = 'https://raw.githubusercontent.com/6vtvnfcfm7-bit/site/main/data.json';
 let globalData = null;
 
 function switchPanel(name) {
@@ -274,14 +265,12 @@ function renderAll() {
   renderSheet('vw-cross', '交叉统计_vw');
   renderSheet('vw-error', '审核错误case_vw');
 
-  // 板块4：云腾（暂用按人统计全部代替，后续可扩展）
-  renderSheet('shenhe-area', '按业务统计（全部）');
 }
 
 function loadData() {
   // 加载中状态
   ['total-business','total-person','non-vw-person','non-vw-cross','non-vw-error',
-   'vw-person','vw-cross','vw-error','shenhe-area'].forEach(id => {
+   'vw-person','vw-cross','vw-error'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = '<div class="loading">加载中...</div>';
   });
