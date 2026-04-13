@@ -121,75 +121,75 @@
     <!-- 板块1：总数据 -->
     <div id="panel-total" class="content-panel active">
       <div class="panel">
-        <div class="panel-header">按业务统计（全部）</div>
+        <div class="panel-header">按业务统计</div>
         <div class="panel-body">
           <div id="total-business" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-header">按人统计（全部）</div>
+        <div class="panel-header">按人统计</div>
         <div class="panel-body">
           <div id="total-person" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-header">交叉统计（全部）</div>
+        <div class="panel-header">交叉统计</div>
         <div class="panel-body">
           <div id="total-cross" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
     </div>
 
-    <!-- 板块2：自有数据（非_vw审核员） -->
+    <!-- 板块2：自有数据 -->
     <div id="panel-non_vw" class="content-panel">
       <div class="panel">
-        <div class="panel-header">按业务统计（全部）</div>
+        <div class="panel-header">按业务统计</div>
         <div class="panel-body">
           <div id="non-vw-business" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-header">按人统计（非vw审核员）</div>
+        <div class="panel-header">按人统计</div>
         <div class="panel-body">
           <div id="non-vw-person" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-header">交叉统计（非vw审核员）</div>
+        <div class="panel-header">交叉统计</div>
         <div class="panel-body">
           <div id="non-vw-cross" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-header">审核错误case（非vw）</div>
+        <div class="panel-header">审核错误case</div>
         <div class="panel-body">
           <div id="non-vw-error" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
     </div>
 
-    <!-- 板块3：菲利信（_vw审核员） -->
+    <!-- 板块3：菲利信 -->
     <div id="panel-renming_vw" class="content-panel">
       <div class="panel">
-        <div class="panel-header">按业务统计（全部）</div>
+        <div class="panel-header">按业务统计</div>
         <div class="panel-body">
           <div id="vw-business" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-header">按人统计（vw审核员）</div>
+        <div class="panel-header">按人统计</div>
         <div class="panel-body">
           <div id="vw-person" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-header">交叉统计（vw审核员）</div>
+        <div class="panel-header">交叉统计</div>
         <div class="panel-body">
           <div id="vw-cross" class="table-container"><div class="loading">加载中...</div></div>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-header">审核错误case（vw审核员）</div>
+        <div class="panel-header">审核错误case</div>
         <div class="panel-body">
           <div id="vw-error" class="table-container"><div class="loading">加载中...</div></div>
         </div>
@@ -258,6 +258,21 @@ function renderSheet(containerId, sheetName) {
   renderTable(containerId, sheet.columns, sheet.data);
 }
 
+// 审核错误case：过滤指定列后渲染
+function renderErrorWithFilter(containerId, sheetName, excludeCols) {
+  if (!globalData || !globalData.sheets || !globalData.sheets[sheetName]) {
+    document.getElementById(containerId).innerHTML = '<div class="empty-tip">暂无 ' + sheetName + ' 数据</div>';
+    return;
+  }
+  const sheet = globalData.sheets[sheetName];
+  const cols = sheet.columns.filter(c => !excludeCols.includes(c));
+  if (cols.length === 0) {
+    document.getElementById(containerId).innerHTML = '<div class="empty-tip">暂无数据</div>';
+    return;
+  }
+  renderTable(containerId, cols, sheet.data);
+}
+
 function renderAll() {
   if (!globalData) return;
 
@@ -274,7 +289,8 @@ function renderAll() {
   renderSheet('non-vw-business', '按业务统计（全部）');
   renderSheet('non-vw-person', '按人统计（非_vw审核员）');
   renderSheet('non-vw-cross', '交叉统计_非vw');
-  renderSheet('non-vw-error', '审核错误case_非vw');
+  // 审核错误case：过滤source_file列
+  renderErrorWithFilter('non-vw-error', '审核错误case_非vw', ['source_file']);
 
   // 板块3：菲利信（vw审核员）
   renderSheet('vw-business', '按业务统计（全部）');
