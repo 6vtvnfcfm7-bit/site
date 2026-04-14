@@ -162,17 +162,17 @@ function renderAll() {
   const meta = globalData.meta || {};
   document.getElementById('dataDate').textContent = '数据日期：' + (meta.date || '未知');
 
-  // 菲利信专用数据（来自shenhe_vw副报表）
-  renderSheet('flx-business', '菲利信_按审核区统计_shenhe_vw');
-  renderSheet('flx-person', '菲利信_按人统计_shenhe_vw');
-  renderSheet('flx-cross', '菲利信_交叉统计_shenhe_vw');
+  // 菲利信专用数据（来自人名vw副报表）
+  renderSheet('flx-business', 'flx-business');
+  renderSheet('flx-person', 'flx-person');
+  renderSheet('flx-cross', 'flx-cross');
   // 审核错误专用列
   renderFlxError();
 }
 
 // 菲利信审核错误：数据ID, operator, qid, rid, result, 标题, 内容, 审核区, is_error, error_type
 function renderFlxError() {
-  const sheetName = '菲利信_审核错误case_vw';
+  const sheetName = 'flx-error';
   if (!globalData || !globalData.sheets || !globalData.sheets[sheetName]) {
     document.getElementById('flx-error').innerHTML = '<div class="empty-tip">暂无数据</div>';
     return;
