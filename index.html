@@ -114,7 +114,7 @@
   <div class="sidebar">
     <div class="nav-item active" onclick="switchPanel('total')">总数据</div>
     <div class="nav-item" onclick="switchPanel('non_vw')">自有数据</div>
-    <div class="nav-item" onclick="switchPanel('renming_vw')">菲利信</div>
+    <div class="nav-item" onclick="switchPanel('renming_vw')">三方数据</div>
   </div>
 
   <div class="content">
@@ -168,7 +168,7 @@
       </div>
     </div>
 
-    <!-- 板块3：菲利信 -->
+    <!-- 板块3：三方数据（vw审核员，来自主报表_vw审核员） -->
     <div id="panel-renming_vw" class="content-panel">
       <div class="panel">
         <div class="panel-header">按业务统计</div>
@@ -286,14 +286,14 @@ function renderAll() {
   renderSheet('total-cross', '交叉统计_总');
 
   // 板块2：自有数据（非_vw审核员）
-  renderSheet('non-vw-business', '自有数据_按业务统计');
+  renderSheet('non-vw-business', '按业务统计（全部）');
   renderSheet('non-vw-person', '按人统计（非_vw审核员）');
   renderSheet('non-vw-cross', '交叉统计_非vw');
   // 审核错误case：过滤source_file列
   renderErrorWithFilter('non-vw-error', '审核错误case_非vw', ['source_file']);
 
-  // 板块3：菲利信（vw审核员）
-  renderSheet('vw-business', 'flx-business');
+  // 板块3：三方数据（vw审核员，全部来自主报表_vw审核员数据）
+  renderSheet('vw-business', 'vw_business_sanfang');
   renderSheet('vw-person', '按人统计（_vw审核员）');
   renderSheet('vw-cross', '交叉统计_vw');
   renderErrorWithFilter('vw-error', '审核错误case_vw', ['source_file']);
